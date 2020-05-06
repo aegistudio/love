@@ -20,6 +20,7 @@
 
 #include "common/version.h"
 #include "common/runtime.h"
+#include "common/ReadyQueue.h"
 #include "modules/love/love.h"
 #include <SDL.h>
 
@@ -210,23 +211,39 @@ static DoneAction runlove(int argc, char **argv, int &retval)
 	lua_getglobal(L, "require");
 	lua_pushstring(L, "love.boot");
 	lua_call(L, 1, 1);
+	int callbackRef = luaL_ref(L, LUA_REGISTRYINDEX);
 
-	// Turn the returned boot function into a coroutine and call it until done.
+	// Create and reference the main coroutine.
 	lua_newthread(L);
-	lua_pushvalue(L, -2);
-	int stackpos = lua_gettop(L);
-	while (love::luax_resume(L, 0) == LUA_YIELD)
-		lua_pop(L, lua_gettop(L) - stackpos);
+	int coroutineRef = luaL_ref(L, LUA_REGISTRYINDEX);
 
-	retval = 0;
-	DoneAction done = DONE_QUIT;
+	// Run the main loop under the specified scheduler.
+	DoneAction done;
+	{
+		love::ReadyQueue rq(L);
 
-	// if love.boot() returns "restart", we'll start up again after closing this
-	// Lua state.
-	if (lua_type(L, -1) == LUA_TSTRING && strcmp(lua_tostring(L, -1), "restart") == 0)
-		done = DONE_RESTART;
-	if (lua_isnumber(L, -1))
-		retval = (int) lua_tonumber(L, -1);
+		// Turn the returned boot function into a coroutine and call it until done.
+		while(1) {
+			// Attempt to invoke the main coroutine first.
+			lua_settop(L, 0);
+			lua_rawgeti(L, LUA_REGISTRYINDEX, coroutineRef);
+			lua_rawgeti(L, LUA_REGISTRYINDEX, callbackRef);
+			if(love::luax_resume(L, 0) != LUA_YIELD) break;
+
+			// Attempt to execute the scheduler then.
+			rq.schedule();
+		}
+
+		retval = 0;
+		done = DONE_QUIT;
+
+		// if love.boot() returns "restart", we'll start up again after closing this
+		// Lua state.
+		if (lua_type(L, -1) == LUA_TSTRING && strcmp(lua_tostring(L, -1), "restart") == 0)
+			done = DONE_RESTART;
+		if (lua_isnumber(L, -1))
+			retval = (int) lua_tonumber(L, -1);
+	}
 
 	lua_close(L);
 

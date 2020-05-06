@@ -294,6 +294,8 @@ set(LOVE_SRC_COMMON
 	src/common/Optional.h
 	src/common/pixelformat.cpp
 	src/common/pixelformat.h
+	src/common/ReadyQueue.cpp
+	src/common/ReadyQueue.h
 	src/common/Reference.cpp
 	src/common/Reference.h
 	src/common/runtime.cpp
