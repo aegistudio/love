@@ -117,6 +117,18 @@ public:
 	static bool getConstant(const char *in, PowerState &out);
 	static bool getConstant(PowerState in, const char *&out);
 
+	/**
+	 * Deploy a file in the asset with name to the target path.
+	 *
+	 * Throws an exception on unsupported platforms. So the caller
+	 * must always judge whether the current platform requires the
+	 * specified deployment. Actually it is recommended to place
+	 * the deployment logic in single file.
+	 *
+	 * @return has the asset been copied successfully.
+	 */
+	bool deployAsset(const char* assetID, const char* destPath) const;
+
 private:
 
 	static StringMap<PowerState, POWER_MAX_ENUM>::Entry powerEntries[];

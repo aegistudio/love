@@ -80,6 +80,13 @@ void requestRecordingPermission();
 
 void showRecordingPermissionMissingDialog();
 
+/*
+ * Extension specialized for android to make it convenient
+ * to access various asset (from lua) and app specialized
+ * file system (like the cache dir).
+ */
+bool deployAsset(const char* asset, const char* destDir);
+
 } // android
 } // love
 

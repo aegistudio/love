@@ -20,6 +20,7 @@
 
 // LOVE
 #include "common/config.h"
+#include "common/Exception.h"
 #include "System.h"
 
 #if defined(LOVE_MACOSX)
@@ -189,6 +190,15 @@ StringMap<System::PowerState, System::POWER_MAX_ENUM>::Entry System::powerEntrie
 };
 
 StringMap<System::PowerState, System::POWER_MAX_ENUM> System::powerStates(System::powerEntries, sizeof(System::powerEntries));
+
+bool System::deployAsset(const char* asset, const char* destPath) const
+{
+#if defined(LOVE_ANDROID)
+	return love::android::deployAsset(asset, destPath);
+#else
+	throw love::Exception("Platform does not support deploy asset.");
+#endif
+}
 
 } // system
 } // love

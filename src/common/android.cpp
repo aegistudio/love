@@ -319,6 +319,31 @@ void showRecordingPermissionMissingDialog()
 	env->DeleteLocalRef(activity);
 }
 
+bool deployAsset(const char* asset, const char* destPath)
+{
+	bool result = false;
+	JNIEnv *env = (JNIEnv*) SDL_AndroidGetJNIEnv();
+	jobject activity = (jobject) SDL_AndroidGetActivity();
+	jclass clazz(env->GetObjectClass(activity));
+
+	jmethodID methodID = env->GetMethodID(clazz, "deployAsset", "(Ljava/lang/String;Ljava/lang/String;)Z");
+	if (methodID == nullptr)
+		env->ExceptionClear();
+	else
+	{
+		jstring asset_jstring = (jstring) env->NewStringUTF(asset);
+		jstring destPath_jstring = (jstring) env->NewStringUTF(destPath);
+		result = env->CallBooleanMethod(activity, methodID, asset_jstring, destPath_jstring);
+		env->DeleteLocalRef(asset_jstring);
+		env->DeleteLocalRef(destPath_jstring);
+	}
+
+	env->DeleteLocalRef(clazz);
+	env->DeleteLocalRef(activity);
+
+	return result;
+}
+
 } // android
 } // love
 

@@ -101,6 +101,16 @@ int w_hasBackgroundMusic(lua_State *L)
 	return 1;
 }
 
+int w_deployAsset(lua_State* L)
+{
+	const char *asset = luaL_checkstring(L, 1);
+	const char *destPath = luaL_checkstring(L, 2);
+	bool deployed = false;
+	luax_catchexcept(L, [&]() { deployed = instance()->deployAsset(asset, destPath); });
+	lua_pushboolean(L, deployed);
+	return 1;
+}
+
 static const luaL_Reg functions[] =
 {
 	{ "getOS", w_getOS },
@@ -111,6 +121,7 @@ static const luaL_Reg functions[] =
 	{ "openURL", w_openURL },
 	{ "vibrate", w_vibrate },
 	{ "hasBackgroundMusic", w_hasBackgroundMusic },
+	{ "deployAsset", w_deployAsset },
 	{ 0, 0 }
 };
 
