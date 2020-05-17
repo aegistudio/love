@@ -200,5 +200,14 @@ bool System::deployAsset(const char* asset, const char* destPath) const
 #endif
 }
 
+std::string System::getAppBasePath() const
+{
+#if defined(LOVE_ANDROID)
+	return love::android::getAppBasePath();
+#else
+	throw love::Exception("Platform does not support get app base path.");
+#endif
+}
+
 } // system
 } // love

@@ -129,6 +129,14 @@ public:
 	 */
 	bool deployAsset(const char* assetID, const char* destPath) const;
 
+	/**
+	 * Get the base path of the deployed app.
+	 *
+	 * Throws an exception on unsupported platforms, just like the
+	 * System::deployAsset above. Otherwise the base path is returned.
+	 */
+	std::string getAppBasePath() const;
+
 private:
 
 	static StringMap<PowerState, POWER_MAX_ENUM>::Entry powerEntries[];

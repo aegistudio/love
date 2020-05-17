@@ -87,6 +87,8 @@ void showRecordingPermissionMissingDialog();
  */
 bool deployAsset(const char* asset, const char* destDir);
 
+std::string getAppBasePath();
+
 } // android
 } // love
 

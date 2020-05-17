@@ -111,6 +111,14 @@ int w_deployAsset(lua_State* L)
 	return 1;
 }
 
+int w_getAppBasePath(lua_State* L)
+{
+	std::string result;
+	luax_catchexcept(L, [&]() { result = instance()->getAppBasePath(); });
+	luax_pushstring(L, result);
+	return 1;
+}
+
 static const luaL_Reg functions[] =
 {
 	{ "getOS", w_getOS },
@@ -122,6 +130,7 @@ static const luaL_Reg functions[] =
 	{ "vibrate", w_vibrate },
 	{ "hasBackgroundMusic", w_hasBackgroundMusic },
 	{ "deployAsset", w_deployAsset },
+	{ "getAppBasePath", w_getAppBasePath },
 	{ 0, 0 }
 };
 

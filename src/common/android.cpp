@@ -344,6 +344,41 @@ bool deployAsset(const char* asset, const char* destPath)
 	return result;
 }
 
+std::string getAppBasePath()
+{
+	std::string result;
+	JNIEnv *env = (JNIEnv*) SDL_AndroidGetJNIEnv();
+	jobject activity = (jobject) SDL_AndroidGetActivity();
+	jclass clazz(env->GetObjectClass(activity));
+
+	jmethodID methodID = env->GetMethodID(clazz, "getAppBasePath", "()Ljava/lang/String;");
+	if (methodID == nullptr)
+		env->ExceptionClear();
+	else
+	{
+		jstring appbasePath_jstring = (jstring) env->CallObjectMethod(activity, methodID);
+		const char* utf = env->GetStringUTFChars(appbasePath_jstring, 0);
+		if (utf)
+		{
+			try
+			{
+				result = std::string(utf);
+			}
+			catch(...)
+			{
+				// Simply ignore the error, and return the empty string back to caller.
+			}
+			env->ReleaseStringUTFChars(appbasePath_jstring, utf);
+		}
+		env->DeleteLocalRef(appbasePath_jstring);
+	}
+
+	env->DeleteLocalRef(clazz);
+	env->DeleteLocalRef(activity);
+
+	return result;
+}
+
 } // android
 } // love
 
